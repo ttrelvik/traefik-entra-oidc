@@ -1,0 +1,17 @@
+# --- Secrets and Environment-Specific Configuration ---
+# Ignore the .env file containing sensitive credentials.
+.env
+
+# --- SSL/TLS Certificates (CRITICAL) ---
+# Ignore the Let's Encrypt certificate store. Never commit this file.
+acme.json
+
+# --- Common System and IDE Files ---
+# Ignore macOS specific files
+.DS_Store
+# Ignore Windows thumbnail cache
+Thumbs.db
+# Ignore Visual Studio Code specific files
+.vscode/
+# Ignore log files
+*.log

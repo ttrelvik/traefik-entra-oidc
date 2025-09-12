@@ -1,0 +1,39 @@
+# API and Dashboard settings
+api:
+  dashboard: true
+  insecure: true
+
+# Enable Logging & Access Logs
+log:
+  level: INFO
+accessLog: {}
+
+# Explicitly enable Prometheus metrics and assign to an entrypoint
+metrics:
+  prometheus:
+    entryPoint: "traefik"
+
+# EntryPoints define the network ports to listen on
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: "https"
+          scheme: "https"
+  https:
+    address: ":443"
+
+# Providers tell Traefik where to find service configurations
+providers:
+  docker:
+    exposedByDefault: false # Safer to explicitly enable services
+
+# Certificate Resolvers handle automatic SSL/TLS with Let's Encrypt
+certificatesResolvers:
+  myresolver:
+    acme:
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: http

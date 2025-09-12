@@ -1,0 +1,71 @@
+# All variables are set in the .env file
+
+services:
+  traefik:
+    image: "traefik:v3.0"
+    container_name: "traefik"
+    # Get environment variables from .env file to pass to Traefik
+    command:
+      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/traefik.yml:ro"
+      - "./acme.json:/acme.json"
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+
+      # --- Router for the Dashboard ---
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.dashboard.entrypoints=https"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+
+      # --- SSO Middleware ---
+      - "traefik.http.routers.dashboard.middlewares=sso-auth"
+      - "traefik.http.middlewares.sso-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.sso-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+
+  traefik-forward-auth:
+    image: "thomseddon/traefik-forward-auth:2"
+    container_name: "traefik-forward-auth"
+    restart: unless-stopped
+    networks:
+      - traefik-net
+    environment:
+      # --- Provider Configuration (Entra ID OIDC) ---
+      - "DEFAULT_PROVIDER=oidc"
+      - "PROVIDERS_OIDC_ISSUER_URL=https://login.microsoftonline.com/${TENANT_ID}/v2.0"
+      - "PROVIDERS_OIDC_CLIENT_ID=${CLIENT_ID}"
+      - "PROVIDERS_OIDC_CLIENT_SECRET=${CLIENT_SECRET}"
+
+      # --- General Auth Configuration ---
+      - "SECRET=${FORWARD_AUTH_SECRET}"
+      - "AUTH_HOST=auth.${DOMAIN}"
+      - "COOKIE_DOMAIN=.${DOMAIN}"    # Cookie valid for all subdomains
+
+      # Restrict login to specific users.
+      # By default traefik-forward-auth compares this to the user "email", NOT the UPN.
+      - "WHITELIST=${ALLOWED_USERS}"
+      - "LOG_LEVEL=info"
+
+    labels:
+      - "traefik.enable=true"
+      # Router for all auth traffic (including /_oauth callback)
+      - "traefik.http.routers.forward-auth.rule=Host(`auth.${DOMAIN}`)"
+      - "traefik.http.routers.forward-auth.entrypoints=https"
+      - "traefik.http.routers.forward-auth.tls=true"
+      - "traefik.http.routers.forward-auth.tls.certresolver=myresolver"
+
+      # Map to the forward-auth container on port 4181
+      - "traefik.http.services.forward-auth.loadbalancer.server.port=4181"
+networks:
+  traefik-net:
+    name: traefik-net
