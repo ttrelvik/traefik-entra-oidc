@@ -106,3 +106,4 @@ services:
       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
       # This line applies the SSO middleware we defined in this project
       - "traefik.http.routers.whoami.middlewares=sso-auth@docker"
+```
