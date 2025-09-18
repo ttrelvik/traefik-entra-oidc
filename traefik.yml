@@ -1,12 +1,14 @@
 # API and Dashboard settings
 api:
   dashboard: true
-  insecure: true
+  insecure: true  # only accessible from within the docker network, used for prometheus metric scraping
 
 # Enable Logging & Access Logs
 log:
   level: INFO
-accessLog: {}
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+  format: json
 
 # Explicitly enable Prometheus metrics and assign to an entrypoint
 metrics:

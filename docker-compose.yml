@@ -16,6 +16,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik.yml:/traefik.yml:ro"
       - "./acme.json:/acme.json"
+      - "traefik-logs:/var/log/traefik"
     networks:
       - traefik-net
     labels:
@@ -66,6 +67,11 @@ services:
 
       # Map to the forward-auth container on port 4181
       - "traefik.http.services.forward-auth.loadbalancer.server.port=4181"
+
 networks:
   traefik-net:
     name: traefik-net
+
+volumes:
+  traefik-logs:
+    name: traefik-logs
