@@ -2,7 +2,7 @@
 
 services:
   traefik:
-    image: "traefik:v3.0"
+    image: "traefik:v3.5"
     container_name: "traefik"
     # Get environment variables from .env file to pass to Traefik
     command:
