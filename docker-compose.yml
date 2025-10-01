@@ -22,20 +22,21 @@ services:
       placement:
         constraints:
           - node.role == manager
-    labels:
-      - "traefik.enable=true"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
-      # --- Router for the Dashboard ---
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.trelvik.net`)"
-      - "traefik.http.routers.dashboard.entrypoints=https"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+        # --- Router for the Dashboard ---
+        - "traefik.http.routers.dashboard.rule=Host(`traefik.trelvik.net`)"
+        - "traefik.http.routers.dashboard.entrypoints=https"
+        - "traefik.http.routers.dashboard.service=api@internal"
+        - "traefik.http.routers.dashboard.tls=true"
+        - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
 
-      # --- SSO Middleware ---
-      - "traefik.http.routers.dashboard.middlewares=sso-auth"
-      - "traefik.http.middlewares.sso-auth.forwardauth.address=http://traefik-forward-auth:4181"
-      - "traefik.http.middlewares.sso-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+        # --- SSO Middleware ---
+        - "traefik.http.routers.dashboard.middlewares=sso-auth"
+        - "traefik.http.middlewares.sso-auth.forwardauth.address=http://traefik-forward-auth:4181"
+        - "traefik.http.middlewares.sso-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
 
   traefik-forward-auth:
     image: "thomseddon/traefik-forward-auth:2"
@@ -45,16 +46,16 @@ services:
       - traefik-net
     deploy:
       replicas: 1
-    labels:
-      - "traefik.enable=true"
-      # Router for all auth traffic (including /_oauth callback)
-      - "traefik.http.routers.forward-auth.rule=Host(`auth.trelvik.net`)"
-      - "traefik.http.routers.forward-auth.entrypoints=https"
-      - "traefik.http.routers.forward-auth.tls=true"
-      - "traefik.http.routers.forward-auth.tls.certresolver=myresolver"
+      labels:
+        - "traefik.enable=true"
+        # Router for all auth traffic (including /_oauth callback)
+        - "traefik.http.routers.forward-auth.rule=Host(`auth.trelvik.net`)"
+        - "traefik.http.routers.forward-auth.entrypoints=https"
+        - "traefik.http.routers.forward-auth.tls=true"
+        - "traefik.http.routers.forward-auth.tls.certresolver=myresolver"
 
-      # Map to the forward-auth container on port 4181
-      - "traefik.http.services.forward-auth.loadbalancer.server.port=4181"
+        # Map to the forward-auth container on port 4181
+        - "traefik.http.services.forward-auth.loadbalancer.server.port=4181"
 
 networks:
   traefik-net:

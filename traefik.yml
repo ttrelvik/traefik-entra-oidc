@@ -4,7 +4,7 @@ api:
 
 # Enable Logging & Access Logs
 log:
-  level: INFO
+  level: DEBUG
 accessLog:
   filePath: "/var/log/traefik/access.log"
   format: json
