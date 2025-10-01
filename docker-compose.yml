@@ -6,7 +6,7 @@ services:
   traefik:
     image: "traefik:v3.5"
     # Get environment variables from .env file to pass to Traefik
-    env_file: .env
+    env_file: .env.traefik
 
     ports:
       - "80:80"
@@ -26,7 +26,7 @@ services:
       - "traefik.enable=true"
 
       # --- Router for the Dashboard ---
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.trelvik.net`)"
       - "traefik.http.routers.dashboard.entrypoints=https"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
@@ -40,33 +40,15 @@ services:
   traefik-forward-auth:
     image: "thomseddon/traefik-forward-auth:2"
     # Get environment variables from .env file to pass to Traefik Forward Auth
-    env_file: .env
+    env_file: .env.traefik-forward-auth
     networks:
       - traefik-net
-    environment:
-      # --- Provider Configuration (Entra ID OIDC) ---
-      - "DEFAULT_PROVIDER=oidc"
-      - "PROVIDERS_OIDC_ISSUER_URL=https://login.microsoftonline.com/${TENANT_ID}/v2.0"
-      - "PROVIDERS_OIDC_CLIENT_ID=${CLIENT_ID}"
-      - "PROVIDERS_OIDC_CLIENT_SECRET=${CLIENT_SECRET}"
-
-      # --- General Auth Configuration ---
-      - "SECRET=${FORWARD_AUTH_SECRET}"
-      - "AUTH_HOST=auth.${DOMAIN}"
-      - "COOKIE_DOMAIN=.${DOMAIN}"    # Cookie valid for all subdomains
-
-      # Restrict login to specific users.
-      # By default traefik-forward-auth compares this to the user "email", NOT the UPN.
-      - "WHITELIST=${ALLOWED_USERS}"
-      - "LOG_LEVEL=info"
-
     deploy:
       replicas: 1
-
     labels:
       - "traefik.enable=true"
       # Router for all auth traffic (including /_oauth callback)
-      - "traefik.http.routers.forward-auth.rule=Host(`auth.${DOMAIN}`)"
+      - "traefik.http.routers.forward-auth.rule=Host(`auth.trelvik.net`)"
       - "traefik.http.routers.forward-auth.entrypoints=https"
       - "traefik.http.routers.forward-auth.tls=true"
       - "traefik.http.routers.forward-auth.tls.certresolver=myresolver"

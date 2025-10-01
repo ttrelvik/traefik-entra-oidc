@@ -1,6 +1,8 @@
 # --- Secrets and Environment-Specific Configuration ---
 # Ignore the .env file containing sensitive credentials.
 .env
+.env.traefik
+.env.traefik-forward-auth
 
 # --- SSL/TLS Certificates (CRITICAL) ---
 # Ignore the Let's Encrypt certificate store. Never commit this file.
