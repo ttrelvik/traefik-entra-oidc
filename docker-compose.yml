@@ -1,3 +1,5 @@
+version: "3.8"
+
 # All variables are set in the .env file
 
 services:
@@ -5,8 +7,6 @@ services:
     image: "traefik:v3.5"
     # Get environment variables from .env file to pass to Traefik
     env_file: .env
-    # command:
-    #   - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
 
     ports:
       - "80:80"
@@ -18,6 +18,10 @@ services:
       - "traefik-logs:/var/log/traefik"
     networks:
       - traefik-net
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     labels:
       - "traefik.enable=true"
 
@@ -56,6 +60,9 @@ services:
       - "WHITELIST=${ALLOWED_USERS}"
       - "LOG_LEVEL=info"
 
+    deploy:
+      replicas: 1
+
     labels:
       - "traefik.enable=true"
       # Router for all auth traffic (including /_oauth callback)
@@ -69,10 +76,9 @@ services:
 
 networks:
   traefik-net:
-    name: traefik-net
-    # Create the network externally using:
+    # Create the network externally first using:
     # `docker network create --driver=overlay traefik-net`
-    # external: true
+    external: true
 
 volumes:
   traefik-logs:

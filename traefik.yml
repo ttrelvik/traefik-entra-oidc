@@ -1,7 +1,6 @@
 # API and Dashboard settings
 api:
   dashboard: true
-  insecure: true  # only accessible from within the docker network, used for prometheus metric scraping
 
 # Enable Logging & Access Logs
 log:
@@ -31,9 +30,8 @@ entryPoints:
 
 # Providers tell Traefik where to find service configurations
 providers:
-  docker:
+  swarm:
     exposedByDefault: false # Safer to explicitly enable services
-    # swarmMode: true         # Enable if using Docker Swarm
 
 # Certificate Resolvers handle automatic SSL/TLS with Let's Encrypt
 certificatesResolvers:
