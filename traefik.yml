@@ -26,16 +26,20 @@ entryPoints:
           scheme: "https"
   https:
     address: ":443"
+  traefik:
+    address: ":8080"
 
 # Providers tell Traefik where to find service configurations
 providers:
   docker:
     exposedByDefault: false # Safer to explicitly enable services
+    # swarmMode: true         # Enable if using Docker Swarm
 
 # Certificate Resolvers handle automatic SSL/TLS with Let's Encrypt
 certificatesResolvers:
   myresolver:
     acme:
       storage: "acme.json"
+      email: ${LETSENCRYPT_EMAIL}
       httpChallenge:
         entryPoint: http

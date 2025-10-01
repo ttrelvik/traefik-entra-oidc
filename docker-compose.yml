@@ -3,12 +3,11 @@
 services:
   traefik:
     image: "traefik:v3.5"
-    container_name: "traefik"
     # Get environment variables from .env file to pass to Traefik
-    command:
-      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+    env_file: .env
+    # command:
+    #   - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
 
-    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -36,8 +35,8 @@ services:
 
   traefik-forward-auth:
     image: "thomseddon/traefik-forward-auth:2"
-    container_name: "traefik-forward-auth"
-    restart: unless-stopped
+    # Get environment variables from .env file to pass to Traefik Forward Auth
+    env_file: .env
     networks:
       - traefik-net
     environment:
@@ -71,6 +70,9 @@ services:
 networks:
   traefik-net:
     name: traefik-net
+    # Create the network externally using:
+    # `docker network create --driver=overlay traefik-net`
+    # external: true
 
 volumes:
   traefik-logs:
