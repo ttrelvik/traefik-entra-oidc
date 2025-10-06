@@ -32,12 +32,14 @@ entryPoints:
 providers:
   swarm:
     exposedByDefault: false # Safer to explicitly enable services
+  docker:
+    exposedByDefault: false # Safer to explicitly enable services
 
 # Certificate Resolvers handle automatic SSL/TLS with Let's Encrypt
 certificatesResolvers:
   myresolver:
     acme:
       storage: "acme.json"
-      email: ${LETSENCRYPT_EMAIL}
+      email: letsencrypt@trelvik.net
       httpChallenge:
         entryPoint: http
