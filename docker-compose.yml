@@ -38,6 +38,9 @@ services:
         - "traefik.http.middlewares.sso-auth.forwardauth.address=http://traefik-forward-auth:4181"
         - "traefik.http.middlewares.sso-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
 
+        # --- Observability Middleware (IP Whitelist) ---
+        - "traefik.http.middlewares.observability-only.ipwhitelist.sourcerange=10.0.4.0/24"
+
   traefik-forward-auth:
     image: "thomseddon/traefik-forward-auth:2"
     # Get environment variables from .env file to pass to Traefik Forward Auth
