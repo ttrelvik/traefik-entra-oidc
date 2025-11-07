@@ -1,0 +1,17 @@
+http:
+  routers:
+    ha:
+      rule: "Host(`ha.trelvik.net`)"
+      entryPoints:
+        - "https"
+      service: "ha"
+      tls:
+        certResolver: "myresolver"
+
+  services:
+    ha:
+      loadBalancer:
+        servers:
+          # This is the magic, no hardcoded IP
+          # It points to your host's port 8123.
+          - url: "http://host.docker.internal:8123"

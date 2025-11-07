@@ -34,6 +34,10 @@ providers:
     exposedByDefault: false # Safer to explicitly enable services
   docker:
     exposedByDefault: false # Safer to explicitly enable services
+  file:
+    # This is the directory *inside the container*
+    directory: /etc/traefik-dynamic
+    watch: true
 
 # Certificate Resolvers handle automatic SSL/TLS with Let's Encrypt
 certificatesResolvers:

@@ -1,12 +1,15 @@
-version: "3.8"
-
-# All variables are set in the .env file
+# variables are set in the .env file
 
 services:
   traefik:
     image: "traefik:v3.5"
     # Get environment variables from .env file to pass to Traefik
     env_file: .env.traefik
+
+    # This allows the container to resolve 'host.docker.internal'
+    # to the host machine's IP address (10.0.1.1 in this case).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
     ports:
       - "80:80"
@@ -16,6 +19,7 @@ services:
       - "./traefik.yml:/traefik.yml:ro"
       - "./acme.json:/acme.json"
       - "traefik-logs:/var/log/traefik"
+      - "./traefik-dynamic:/etc/traefik-dynamic:ro"
     networks:
       - traefik-net
     deploy:
