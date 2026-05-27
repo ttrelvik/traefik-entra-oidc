@@ -7,6 +7,7 @@
 # --- SSL/TLS Certificates (CRITICAL) ---
 # Ignore the Let's Encrypt certificate store. Never commit this file.
 acme.json
+acme.json.*.bak
 
 # --- Common System and IDE Files ---
 # Ignore macOS specific files
