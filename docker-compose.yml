@@ -2,7 +2,7 @@
 
 services:
   traefik:
-    image: "traefik:v3.5"
+    image: "traefik:v3.7.1"
     # Get environment variables from .env file to pass to Traefik
     env_file: .env.traefik
 
@@ -42,8 +42,8 @@ services:
         - "traefik.http.middlewares.sso-auth.forwardauth.address=http://traefik-forward-auth:4181"
         - "traefik.http.middlewares.sso-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
 
-        # --- Observability Middleware (IP Whitelist) ---
-        - "traefik.http.middlewares.observability-only.ipwhitelist.sourcerange=10.0.4.0/24"
+        # --- Observability Middleware (IP AllowList) ---
+        - "traefik.http.middlewares.observability-only.ipallowlist.sourcerange=10.0.4.0/24"
 
   traefik-forward-auth:
     image: "thomseddon/traefik-forward-auth:2"
