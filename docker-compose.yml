@@ -42,7 +42,8 @@ services:
         - "traefik.http.middlewares.sso-auth.forwardauth.address=http://traefik-forward-auth:4181"
         - "traefik.http.middlewares.sso-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
         - "traefik.http.middlewares.sso-auth.forwardauth.trustForwardHeader=true"
-        - "traefik.http.middlewares.sso-auth.forwardauth.maxResponseBodySize=0"
+        - "traefik.http.middlewares.sso-auth.forwardauth.maxResponseBodySize=8192"
+        - "traefik.http.middlewares.sso-auth.forwardauth.addAuthCookiesToResponse=_forward_auth,_forward_auth_csrf"
 
         # --- Observability Middleware (IP AllowList) ---
         - "traefik.http.middlewares.observability-only.ipallowlist.sourcerange=10.0.4.0/24"
