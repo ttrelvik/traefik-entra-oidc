@@ -1,0 +1,13 @@
+# Local Terraform execution artifacts
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Variables and Secrets (Never commit these)
+*.tfvars
+*.tfvars.json
+
+# Local Ansible execution artifacts
+ansible_inventory.ini
+*.retry

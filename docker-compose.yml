@@ -19,7 +19,6 @@ services:
       - "./traefik.yml:/traefik.yml:ro"
       - "./acme.json:/acme.json"
       - "traefik-logs:/var/log/traefik"
-      - "./traefik-dynamic:/etc/traefik-dynamic:ro"
     networks:
       - traefik-net
     deploy:
@@ -31,7 +30,7 @@ services:
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
         # --- Router for the Dashboard ---
-        - "traefik.http.routers.dashboard.rule=Host(`traefik.trelvik.net`)"
+        - "traefik.http.routers.dashboard.rule=Host(`traefik.az.trelvik.net`)"
         - "traefik.http.routers.dashboard.entrypoints=https"
         - "traefik.http.routers.dashboard.service=api@internal"
         - "traefik.http.routers.dashboard.tls=true"
@@ -59,7 +58,7 @@ services:
       labels:
         - "traefik.enable=true"
         # Router for all auth traffic (including /_oauth callback)
-        - "traefik.http.routers.forward-auth.rule=Host(`auth.trelvik.net`)"
+        - "traefik.http.routers.forward-auth.rule=Host(`auth.az.trelvik.net`)"
         - "traefik.http.routers.forward-auth.entrypoints=https"
         - "traefik.http.routers.forward-auth.tls=true"
         - "traefik.http.routers.forward-auth.tls.certresolver=myresolver"

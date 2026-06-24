@@ -1,0 +1,130 @@
+---
+- name: Configure Gateway VM and Initialize Docker Swarm
+  hosts: swarm_manager
+  become: yes
+  tasks:
+    - name: Update apt cache and upgrade packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+        cache_valid_time: 3600
+
+    - name: Install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - software-properties-common
+        state: present
+
+    - name: Create directory for Docker apt keyrings
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker GPG apt key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Engine and plugins
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running and enabled
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add admin user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Check if Docker Swarm is already active
+      ansible.builtin.command: docker info --format '{% raw %}{{.Swarm.LocalNodeState}}{% endraw %}'
+      register: swarm_status
+      changed_when: false
+
+    - name: Initialize Docker Swarm
+      ansible.builtin.command: "docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}"
+      when: swarm_status.stdout == 'inactive'
+
+    - name: Check if traefik-net overlay network exists
+      ansible.builtin.command: docker network inspect traefik-net
+      register: network_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create traefik-net overlay network
+      ansible.builtin.command: docker network create --driver=overlay --attachable traefik-net
+      when: network_check.rc != 0
+
+    - name: Ensure deployment directory exists
+      ansible.builtin.file:
+        path: /opt/traefik
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Transfer acme.json with strict permissions
+      ansible.builtin.copy:
+        src: ../acme.json
+        dest: /opt/traefik/acme.json
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+        force: no
+
+    - name: Transfer docker-compose.yml
+      ansible.builtin.copy:
+        src: ../docker-compose.yml
+        dest: /opt/traefik/docker-compose.yml
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Transfer traefik.yml
+      ansible.builtin.copy:
+        src: ../traefik.yml
+        dest: /opt/traefik/traefik.yml
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Transfer env files
+      ansible.builtin.copy:
+        src: "../{{ item }}"
+        dest: "/opt/traefik/{{ item }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+      loop:
+        - .env.traefik
+        - .env.traefik-forward-auth
+
+    - name: Deploy traefik-entra-oidc stack
+      ansible.builtin.command: docker stack deploy -c docker-compose.yml traefik
+      args:
+        chdir: /opt/traefik
