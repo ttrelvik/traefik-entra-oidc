@@ -18,3 +18,5 @@ Thumbs.db
 .vscode/
 # Ignore log files
 *.log
+
+az-migration/
