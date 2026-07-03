@@ -31,7 +31,7 @@ variable "ssh_public_key_path" {
 variable "ssh_source_address_prefix" {
   type        = string
   description = "Source IP address allowed for inbound SSH traffic."
-  default     = "108.48.236.91"
+  default     = "96.231.99.187"
 }
 
 variable "dns_zone_name" {
