@@ -19,4 +19,7 @@ Thumbs.db
 # Ignore log files
 *.log
 
+# Ignore NFS silly renamed files
+.nfs*
+
 az-migration/
