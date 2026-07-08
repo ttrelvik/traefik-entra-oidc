@@ -2,7 +2,7 @@
 
 services:
   traefik:
-    image: "traefik:v3.7.6"
+    image: "traefik:v3.7.7"
     # Get environment variables from .env file to pass to Traefik
     env_file: .env.traefik
 
