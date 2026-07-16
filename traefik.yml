@@ -47,3 +47,6 @@ certificatesResolvers:
       email: letsencrypt@trelvik.net
       httpChallenge:
         entryPoint: http
+
+# Enable ping endpoint for healthcheck
+ping: {}

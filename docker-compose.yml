@@ -22,10 +22,21 @@ services:
       - "./traefik-dynamic:/etc/traefik-dynamic:ro"
     networks:
       - traefik-net
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     deploy:
       placement:
         constraints:
           - node.role == manager
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 200M
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
@@ -56,6 +67,11 @@ services:
       - traefik-net
     deploy:
       replicas: 1
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 24M
       labels:
         - "traefik.enable=true"
         # Router for all auth traffic (including /_oauth callback)
