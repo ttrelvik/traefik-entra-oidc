@@ -6,7 +6,7 @@ api:
 log:
   level: INFO
 accessLog:
-  filePath: "/var/log/traefik/access.log"
+  # log to stdout
   format: json
 
 # Explicitly enable Prometheus metrics and assign to an entrypoint

@@ -18,7 +18,6 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik.yml:/traefik.yml:ro"
       - "./acme.json:/acme.json"
-      - "traefik-logs:/var/log/traefik"
       - "./traefik-dynamic:/etc/traefik-dynamic:ro"
     networks:
       - traefik-net
@@ -88,7 +87,3 @@ networks:
     # Create the network externally first using:
     # `docker network create --driver=overlay traefik-net`
     external: true
-
-volumes:
-  traefik-logs:
-    name: traefik-logs
