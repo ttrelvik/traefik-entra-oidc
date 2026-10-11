@@ -14,6 +14,14 @@ metrics:
   prometheus:
     entryPoint: "traefik"
 
+# OpenTelemetry distributed tracing
+tracing:
+  serviceName: "traefik"
+  otlp:
+    grpc:
+      endpoint: "alloy:4317"
+      insecure: true
+
 # EntryPoints define the network ports to listen on
 entryPoints:
   http:

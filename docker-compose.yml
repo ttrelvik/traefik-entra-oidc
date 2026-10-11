@@ -6,10 +6,11 @@ services:
     # Get environment variables from .env file to pass to Traefik
     env_file: .env.traefik
 
-    # This allows the container to resolve 'host.docker.internal'
-    # to the host machine's IP address (10.0.1.1 in this case).
+    # This allows the container to resolve 'host.docker.internal' and 'alloy'
+    # to the host machine's IP address (Alloy publishes OTLP gRPC 4317 in mode: host).
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "alloy:host-gateway"
 
     ports:
       - "80:80"
@@ -87,3 +88,9 @@ networks:
     # Create the network externally first using:
     # `docker network create --driver=overlay traefik-net`
     external: true
+  # Note: Host mapping (via extra_hosts above) is active and communicates with Alloy
+  # on host port 4317. If you instead prefer attaching Traefik directly to the
+  # observability overlay network, uncomment the block below and attach Traefik to it:
+  # observability-net:
+  #   name: observability_observability-net
+  #   external: true
