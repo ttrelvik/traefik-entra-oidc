@@ -13,8 +13,14 @@ services:
       - "alloy:host-gateway"
 
     ports:
-      - "80:80"
-      - "443:443"
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik.yml:/traefik.yml:ro"
@@ -23,7 +29,7 @@ services:
     networks:
       - traefik-net
     healthcheck:
-      test: ["CMD", "traefik", "healthcheck"]
+      test: [ "CMD", "traefik", "healthcheck" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -89,8 +95,8 @@ networks:
     # `docker network create --driver=overlay traefik-net`
     external: true
   # Note: Host mapping (via extra_hosts above) is active and communicates with Alloy
-  # on host port 4317. If you instead prefer attaching Traefik directly to the
-  # observability overlay network, uncomment the block below and attach Traefik to it:
+  # on host port 4317. To instead attach Traefik directly to the observability 
+  # overlay network, uncomment the block below and attach Traefik to it:
   # observability-net:
   #   name: observability_observability-net
   #   external: true
